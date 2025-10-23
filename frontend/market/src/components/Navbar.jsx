@@ -18,10 +18,10 @@ const Navbar = () => {
                 <li className='p-4'>Sell</li>
             </ul>     
             <div onClick={handleNav} className='block md:hidden'>
-                {!nav ? <AiOutlineClose size={20}/> : <AiOutlineMenu size={20} />}
+                {!nav ? <AiOutlineMenu size={20}/> : <AiOutlineClose size={20} />}
 
             </div>   
-            <div className={!nav ? 'fixed left-0 top-0 w-[60%] h-full border-r border-r-gray-900 bg-[#000300] ease-in-out duration-500' : 'fixed left-[-100%] ease-in-out duration-500'}>
+            <div className={!nav ? 'fixed left-[-100%] ease-in-out duration-500' : 'fixed left-0 top-0 w-[60%] h-full border-r border-r-gray-900 bg-[#000300] ease-in-out duration-500' }>
                 <h1 className='w-full text-3xl font-bold text-[#E0B0FF] m-4'>MARKETPLACE</h1>
                 
 
