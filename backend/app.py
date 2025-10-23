@@ -2,10 +2,6 @@ from flask import Flask, jsonify, request;
 
 app = Flask(__name__)
 
-items = [
-    {"name": "book", "price": 20, "user": "rafa"},
-]
-
 @app.route("/")
 def welcome():
     return "MWAHAHAHAHAHA"
