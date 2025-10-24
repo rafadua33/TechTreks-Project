@@ -1,7 +1,12 @@
 import React from 'react'
 import {ReactTyped} from 'react-typed';
+import { useNavigate } from "react-router-dom";
+
 
 const Hero = () => {
+
+const navigate = useNavigate();
+
     return (
         <div className='text-white'>
             <div className='max-w-[800px] mt-[-96px] w-full h-screen mx-auto text-center flex flex-col justify-center'>
@@ -12,7 +17,9 @@ const Hero = () => {
                     <ReactTyped strings={['buy', 'sell', 'connect']} typeSpeed={100} backSpeed={120} loop className='md:text=5xl sm:text-4xl text-xl font-bold text-[#E0B0FF] pl-2'/>
                 </div>
                 {/* <p className='md:text-2xl text-xl font-bold text-gray-600'></p> */}
-                <button className='bg-[#E0B0FF] w-[200px] rounded-md font-medium my-6 mx-auto py-3 text-black'>Get Started</button>
+                <button className='bg-[#E0B0FF] w-[200px] rounded-md font-medium my-6 mx-auto py-2 text-black 
+                hover:text-[#E0B0FF] hover:bg-transparent border-2 border-transparent hover:border-[#E0B0FF] px-8 transition duration-300'
+                onClick={() => navigate("/login")}>Get Started</button>
             </div>
         </div>
 

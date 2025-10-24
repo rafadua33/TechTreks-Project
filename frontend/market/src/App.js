@@ -1,14 +1,30 @@
-import React from 'react'
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Analytics from './components/Hero';
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import Analytics from "./components/Analytics";
+import LoginPage from "./pages/LoginPage";
+import Buy from "./pages/Buy";
+import Sell from "./pages/Sell";
 
 function App() {
   return (
-    <div >
+    <div className="bg-gray-900 min-h-screen">
       <Navbar />
-      <Hero />
-      <Analytics />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              <Analytics />
+            </>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="buy" element={<Buy />} />
+        <Route path="sell" element={<Sell />} />
+
+      </Routes>
     </div>
   );
 }
