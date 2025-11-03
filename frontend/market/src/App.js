@@ -21,8 +21,8 @@ function App() {
           }
         />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="buy" element={<Buy />} />
-        <Route path="sell" element={<Sell />} />
+        <Route path="/buy" element={<Buy />} />
+        <Route path="/sell" element={<Sell />} />
 
       </Routes>
     </div>
