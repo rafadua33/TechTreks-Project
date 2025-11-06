@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 const LoginPage = () => {
 
@@ -70,7 +71,7 @@ const LoginPage = () => {
             id = "password"
             type = "password"
             name = "password"
-             value = {password}
+            value = {password}
             onChange = {((e) => { setPassword(e.target.value); if (error) setError(null); })}
             placeholder="Enter your password"
             className = "font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black"
@@ -83,6 +84,10 @@ const LoginPage = () => {
                    border-2 border-transparent hover:border-[#E0B0FF] px-8 transition duration-300'>
                    Log In</button>
       </form>
+      <div className="flex items-center justify-center gap-2 mt-2">
+        <span className="font-semibold">New to NYU Marketplace?</span>
+        <Link to="/register" className="text-[#E0B0FF] hover:underline ml-2"> Create an account </Link>
+      </div>
     </div>
     
   );

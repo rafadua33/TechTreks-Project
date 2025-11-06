@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
+const Register = () => {
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+      setLoading(true);
+      setError(null);
+   
+    // backend, deleted it because it will probably be different from the frontend
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-start mt-20">
+      <form onSubmit = {handleSubmit}>
+         {error && (
+            <p role= "alert" aria-live="polite" className="text-red-400 bg-red-900/20 px-3 py-2 rounded mb-4">
+              Your username or password is incorrect. Please try again.
+            </p>
+        )}
+        <div >
+            <label htmlFor="username" className = "font-bold">Username:</label>
+            <p><input 
+                id = "username" 
+                type = "text"
+                name = "username"
+                value = {username}
+                onChange = {((e) => { setUsername(e.target.value); if (error) setError(null); })}
+                placeholder = "Enter your username"
+                className = 'font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black'
+            /></p>
+        </div>
+        <div>
+            <label htmlFor="email" className = "font-bold">Email:</label>
+            <p><input
+                id = "email"
+                type = "email"
+                name = "email"
+                value = {email}
+                onChange = {((e) => { setEmail(e.target.value); if (error) setError(null); })}
+                placeholder="Enter your email"
+                className = "font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black"
+            /></p>
+        </div>
+       
+        <div>
+            <label htmlFor="password" className = "font-bold">Password:</label>
+            <p><input
+                id = "password"
+                type = "password"
+                name = "password"
+                value = {password}
+                onChange = {((e) => { setPassword(e.target.value); if (error) setError(null); })}
+                placeholder="Enter your password"
+                className = "font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black"
+            /></p>
+        </div>
+        <button type = "submit" 
+        className='bg-[#E0B0FF] w-[200px] rounded-md
+                   font-medium my-6 mx-auto py-2 text-black 
+                 hover:text-[#E0B0FF] hover:bg-transparent 
+                   border-2 border-transparent hover:border-[#E0B0FF] px-8 transition duration-300'>
+                   Create</button>
+      </form>
+      <div className="flex items-center justify-center gap-2 mt-2">
+            <span className="font-semibold">Already have an account?</span>
+            <Link to="/login" className="text-[#E0B0FF] hover:underline ml-2"> Log In </Link>
+      </div>
+    </div>
+    
+  );
+};
+
+export default Register;

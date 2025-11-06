@@ -5,6 +5,7 @@ import Analytics from "./components/Analytics";
 import LoginPage from "./pages/LoginPage";
 import Buy from "./pages/Buy";
 import Sell from "./pages/Sell";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/buy" element={<Buy />} />
         <Route path="/sell" element={<Sell />} />
+        <Route path="/register" element={<Register />} />
 
       </Routes>
     </div>
