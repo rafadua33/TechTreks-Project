@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from werkzeug.security import check_password_hash, generate_password_hash
-from backend.models import db, User
+from models import db, User
 
 auth = Blueprint("auth", __name__)
 

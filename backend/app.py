@@ -11,11 +11,11 @@ app.register_blueprint(auth_bp, url_prefix="/auth")
 
 @app.route("/")
 def welcome():
-    return "MWAHAHAHAHAHA"
+    return ""
 
-@app.route("/items/", methods = ['GET'])
-def get_item():
-    return items
+#@app.route("/items/", methods = ['GET'])
+#def get_item():
+#    return items
 
 if __name__ == "__main__":
     app.run(debug = True)
