@@ -5,8 +5,12 @@ const LoginPage = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
+      setLoading(true);
+      setError(null);
    
     // This is where you will connect it to the backend!!
     try {
@@ -22,21 +26,31 @@ const LoginPage = () => {
 
       if (!res.ok) {
         console.error("Login failed:", data);
+        setError(data?.message || data?.error || `Login failed (${res.status})`);
+        setLoading(false);
         return;
       }
 
       // success: server responded 200
       console.log("Login success:", data);
+      setLoading(false);
       // TODO: redirect, update app auth state, or store token depending on your auth strategy
     } catch (err) {
       // network or parsing error
       console.error("Network error:", err);
+      setError(err?.message || "Network error");
+      setLoading(false);
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-start mt-20">
       <form onSubmit = {handleSubmit}>
+         {error && (
+            <p role= "alert" aria-live="polite" className="text-red-400 bg-red-900/20 px-3 py-2 rounded mb-4">
+              Your username or password is incorrect. Please try again.
+            </p>
+        )}
         <div >
           <label htmlFor="username" className = "font-bold">Username:</label>
           <p><input 
@@ -44,11 +58,12 @@ const LoginPage = () => {
             type = "text"
             name = "username"
             value = {username}
-            onChange = {((e) => setUsername(e.target.value))}
+            onChange = {((e) => { setUsername(e.target.value); if (error) setError(null); })}
             placeholder = "Enter your username"
             className = 'font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black'
             /></p>
         </div>
+       
         <div>
           <label htmlFor="password" className = "font-bold">Password:</label>
           <p><input
@@ -56,7 +71,7 @@ const LoginPage = () => {
             type = "password"
             name = "password"
              value = {password}
-            onChange = {((e) => setPassword(e.target.value))}
+            onChange = {((e) => { setPassword(e.target.value); if (error) setError(null); })}
             placeholder="Enter your password"
             className = "font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black"
             /></p>
