@@ -5,11 +5,33 @@ const LoginPage = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
    
     // This is where you will connect it to the backend!!
+    try {
+      // send credentials to backend auth endpoint
+      const res = await fetch("http://localhost:5000/auth/login", {
+        method: "POST", // HTTP verb
+        headers: { "Content-Type": "application/json" }, // we're sending JSON
+        credentials: "include",
+        body: JSON.stringify({ username, password }), // make the form state JSON
+      });
 
+      const data = await res.json(); // parse JSON response body
+
+      if (!res.ok) {
+        console.error("Login failed:", data);
+        return;
+      }
+
+      // success: server responded 200
+      console.log("Login success:", data);
+      // TODO: redirect, update app auth state, or store token depending on your auth strategy
+    } catch (err) {
+      // network or parsing error
+      console.error("Network error:", err);
+    }
   }
 
   return (
