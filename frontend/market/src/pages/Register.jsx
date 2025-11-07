@@ -18,6 +18,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-start mt-20">
+      <h2 className="text-4xl font-bold mb-8">Register</h2>
       <form onSubmit = {handleSubmit}>
          {error && (
             <p role= "alert" aria-live="polite" className="text-red-400 bg-red-900/20 px-3 py-2 rounded mb-4">
@@ -62,7 +63,7 @@ const Register = () => {
             /></p>
         </div>
         <button type = "submit" 
-        className='bg-[#E0B0FF] w-[200px] rounded-md
+        className='bg-[#E0B0FF] w-[243px] rounded-md
                    font-medium my-6 mx-auto py-2 text-black 
                  hover:text-[#E0B0FF] hover:bg-transparent 
                    border-2 border-transparent hover:border-[#E0B0FF] px-8 transition duration-300'>
