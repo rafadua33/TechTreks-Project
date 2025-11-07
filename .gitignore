@@ -29,3 +29,6 @@ __pycache__/
 
 # virtualenv
 env/
+
+# test file
+test_db_setup.py
