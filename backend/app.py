@@ -19,10 +19,12 @@ db.init_app(app)
 
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret")
 
+IS_PROD = os.environ.get("FLASK_ENV") == "production"
+
 # secure session cookie settings
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=True,        # set True in production (requires HTTPS)
+    SESSION_COOKIE_SECURE=IS_PROD,        # set True in production (requires HTTPS)
     SESSION_COOKIE_SAMESITE="Lax",     # or "Strict"
     PERMANENT_SESSION_LIFETIME=3600,   # seconds, optional
 )
