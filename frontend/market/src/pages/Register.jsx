@@ -16,7 +16,7 @@ const Register = () => {
    
     try {
       // Send registration data to backend
-      const res = await fetch("http://localhost:5000/auth/register", {
+      const res = await fetch("http://localhost:5001/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // include cookies for session-based auth
@@ -33,7 +33,7 @@ const Register = () => {
       }
 
       // Registration successful - now log the user in
-      const loginRes = await fetch("http://localhost:5000/auth/login", {
+      const loginRes = await fetch("http://localhost:5001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
