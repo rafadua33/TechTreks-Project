@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
@@ -8,6 +8,74 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Availability states
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [emailAvailable, setEmailAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  
+  // Debounce username check
+  useEffect(() => {
+    if (!username || username.length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setCheckingUsername(true);
+      try {
+        const res = await fetch("http://localhost:5001/auth/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          setUsernameAvailable(data.username_available);
+        }
+      } catch (err) {
+        console.error("Error checking username:", err);
+      } finally {
+        setCheckingUsername(false);
+      }
+    }, 500); // Wait 500ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [username]);
+
+  // Debounce email check
+  useEffect(() => {
+    if (!email || !email.includes("@")) {
+      setEmailAvailable(null);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setCheckingEmail(true);
+      try {
+        const res = await fetch("http://localhost:5001/auth/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          setEmailAvailable(data.email_available);
+        }
+      } catch (err) {
+        console.error("Error checking email:", err);
+      } finally {
+        setCheckingEmail(false);
+      }
+    }, 500); // Wait 500ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [email]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,27 +136,77 @@ const Register = () => {
         )}
         <div >
             <label htmlFor="username" className = "font-bold">Username:</label>
-            <p><input 
-                id = "username" 
-                type = "text"
-                name = "username"
-                value = {username}
-                onChange = {((e) => { setUsername(e.target.value); if (error) setError(null); })}
-                placeholder = "Enter your username"
-                className = 'font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black'
-            /></p>
+            <div className="relative">
+              <input 
+                  id = "username" 
+                  type = "text"
+                  name = "username"
+                  value = {username}
+                  onChange = {((e) => { 
+                    setUsername(e.target.value); 
+                    if (error) setError(null);
+                    setUsernameAvailable(null);
+                  })}
+                  placeholder = "Enter your username"
+                  className = {`font-bold rounded-lg px-4 py-2 mb-1 focus:border-yellow-500 border-2 text-black w-full ${
+                    usernameAvailable === true ? 'border-green-500' : 
+                    usernameAvailable === false ? 'border-red-500' : 
+                    'border-gray-300'
+                  }`}
+              />
+              {checkingUsername && (
+                <span className="absolute right-3 top-2 text-gray-500 text-sm">Checking...</span>
+              )}
+              {!checkingUsername && usernameAvailable === true && (
+                <span className="absolute right-3 top-2 text-green-500 text-xl">✓</span>
+              )}
+              {!checkingUsername && usernameAvailable === false && (
+                <span className="absolute right-3 top-2 text-red-500 text-xl">✗</span>
+              )}
+            </div>
+            {usernameAvailable === false && (
+              <p className="text-red-400 text-sm mb-2">Username is already taken</p>
+            )}
+            {usernameAvailable === true && (
+              <p className="text-green-400 text-sm mb-2">Username is available</p>
+            )}
         </div>
         <div>
             <label htmlFor="email" className = "font-bold">Email:</label>
-            <p><input
-                id = "email"
-                type = "email"
-                name = "email"
-                value = {email}
-                onChange = {((e) => { setEmail(e.target.value); if (error) setError(null); })}
-                placeholder="Enter your email"
-                className = "font-bold rounded-lg px-4 py-2 mb-4 focus: border-yellow-500 border-w-5 text-black"
-            /></p>
+            <div className="relative">
+              <input
+                  id = "email"
+                  type = "email"
+                  name = "email"
+                  value = {email}
+                  onChange = {((e) => { 
+                    setEmail(e.target.value); 
+                    if (error) setError(null);
+                    setEmailAvailable(null);
+                  })}
+                  placeholder="Enter your email"
+                  className = {`font-bold rounded-lg px-4 py-2 mb-1 focus:border-yellow-500 border-2 text-black w-full ${
+                    emailAvailable === true ? 'border-green-500' : 
+                    emailAvailable === false ? 'border-red-500' : 
+                    'border-gray-300'
+                  }`}
+              />
+              {checkingEmail && (
+                <span className="absolute right-3 top-2 text-gray-500 text-sm">Checking...</span>
+              )}
+              {!checkingEmail && emailAvailable === true && (
+                <span className="absolute right-3 top-2 text-green-500 text-xl">✓</span>
+              )}
+              {!checkingEmail && emailAvailable === false && (
+                <span className="absolute right-3 top-2 text-red-500 text-xl">✗</span>
+              )}
+            </div>
+            {emailAvailable === false && (
+              <p className="text-red-400 text-sm mb-2">Email is already registered</p>
+            )}
+            {emailAvailable === true && (
+              <p className="text-green-400 text-sm mb-2">Email is available</p>
+            )}
         </div>
        
         <div>
