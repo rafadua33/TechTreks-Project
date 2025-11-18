@@ -1,0 +1,19 @@
+# Flask and extensions
+Flask==3.1.2
+Flask-SQLAlchemy==3.1.1
+Flask-CORS==6.0.1
+
+# Security
+Werkzeug==3.1.3
+
+# Database
+SQLAlchemy==2.0.44
+
+# Other dependencies
+blinker==1.9.0
+click==8.3.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+
+# run with pip install -r requirements.txt
