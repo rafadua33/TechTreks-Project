@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 from auth.login import auth as auth_bp
 from models import db
 import logging
@@ -13,13 +12,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
-db.init_app(app)    
+db.init_app(app)
+
+# Create database tables if they don't exist
+with app.app_context():
+    db.create_all()
 
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-in-production")
 
 IS_PROD = os.environ.get("FLASK_ENV") == "production"
 
-# Session cookie settings - FIX: Use Lax for development
+# Session cookie settings
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=False,  # False for local HTTP development
@@ -28,12 +31,14 @@ app.config.update(
     PERMANENT_SESSION_LIFETIME=3600,
 )
 
-# CORS configuration - allow credentials from frontend origin
-CORS(app, 
-     resources={r"/*": {"origins": "http://localhost:3000"}},
-     supports_credentials=True,
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+# Allow localhost:3000 with credentials
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
 # logging
 logging.basicConfig(level=logging.INFO)
