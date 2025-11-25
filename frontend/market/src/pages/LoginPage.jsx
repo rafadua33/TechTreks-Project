@@ -45,7 +45,7 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-start mt-20">
+    <div className="min-h-screen bg-[#000328] text-white flex flex-col items-center justify-start mt-20">
       <h1 className="text-4xl font-bold mb-8">Log In</h1>
       <form onSubmit = {handleSubmit}>
          {error && (

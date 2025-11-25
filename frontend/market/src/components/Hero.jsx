@@ -1,5 +1,6 @@
 import React from 'react'
-import {ReactTyped} from 'react-typed';
+import {ReactTyped} from 'react-typed'; 
+    // use framer motion??
 import { useNavigate } from "react-router-dom";
 
 
@@ -8,7 +9,10 @@ const Hero = () => {
 const navigate = useNavigate();
 
     return (
-        <div className='text-white'>
+        <div className='text-white' 
+        style={{
+          background: 'linear-gradient(180deg, hsla(236, 100%, 8%, 1) 40%, hsla(253, 32%, 30%, 1) 64%, hsla(262, 25%, 45%, 1) 76%, hsla(268, 30%, 58%, 1) 85%, hsla(276, 100%, 85%, 1) 100%)'
+        }}>
             <div className='max-w-[800px] mt-[-96px] w-full h-screen mx-auto text-center flex flex-col justify-center'>
                 <p className='text-[#E0B0FF] font-bold md:text=5xl sm:text-4xl text-xl'>WELCOME TO</p>
                 <h1 className='md:text-7xl sm:text-6xl text-4xl font-bold md:py-6 p-2'>NYU Marketplace.</h1>
