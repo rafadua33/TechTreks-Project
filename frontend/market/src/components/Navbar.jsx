@@ -28,8 +28,10 @@ const Navbar = () => {
         >
           Login
         </li>
-        <li className="p-4 hover:text-[#E0B0FF] transition duration = 300"
-            onClick={() => navigate("/buy")}>Buy</li>
+    <li className="p-4 hover:text-[#E0B0FF] transition duration = 300"
+      onClick={() => navigate("/buy")}>Buy</li>
+    <li className="p-4 hover:text-[#E0B0FF] transition duration = 300"
+      onClick={() => navigate("/products")}>Products</li>
         <li className="p-4 hover:text-[#E0B0FF] transition duration = 300"
             onClick={() => navigate("/sell")}>Sell</li>
       </ul>
@@ -54,6 +56,8 @@ const Navbar = () => {
             onClick={() => {navigate("/login"); handleNav(); }}>Login</li>
           <li className="p-4 border-b border-gray-600 hover:text-[#E0B0FF] transition duration = 300"
             onClick={() => {navigate("/buy"); handleNav(); }}>Buy</li>
+          <li className="p-4 border-b border-gray-600 hover:text-[#E0B0FF] transition duration = 300"
+            onClick={() => {navigate("/products"); handleNav(); }}>Products</li>
           <li className="p-4 hover:text-[#E0B0FF] transition duration = 300"
             onClick={() => {navigate("/sell"); handleNav(); }}>Sell</li>
         </ul>
