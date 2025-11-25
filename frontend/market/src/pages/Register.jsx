@@ -21,29 +21,33 @@ const Register = () => {
       setUsernameAvailable(null);
       return;
     }
-
-    const timeoutId = setTimeout(async () => {
-      setCheckingUsername(true);
+    let active = true;
+    setCheckingUsername(true);
+    const timer = setTimeout(async () => {
       try {
         const res = await fetch("http://localhost:5001/auth/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ username }),
+          credentials: "include"
         });
-
+        if (!res.ok) {
+          throw new Error("check failed");
+        }
         const data = await res.json();
-        if (res.ok) {
+        if (active) {
           setUsernameAvailable(data.username_available);
         }
       } catch (err) {
-        console.error("Error checking username:", err);
+        if (active) setUsernameAvailable(null);
       } finally {
-        setCheckingUsername(false);
+        if (active) setCheckingUsername(false);
       }
-    }, 500); // Wait 500ms after user stops typing
-
-    return () => clearTimeout(timeoutId);
+    }, 500);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [username]);
 
   // Debounce email check
@@ -52,29 +56,33 @@ const Register = () => {
       setEmailAvailable(null);
       return;
     }
-
-    const timeoutId = setTimeout(async () => {
-      setCheckingEmail(true);
+    let active = true;
+    setCheckingEmail(true);
+    const timer = setTimeout(async () => {
       try {
         const res = await fetch("http://localhost:5001/auth/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ email }),
+          credentials: "include"
         });
-
+        if (!res.ok) {
+          throw new Error("check failed");
+        }
         const data = await res.json();
-        if (res.ok) {
+        if (active) {
           setEmailAvailable(data.email_available);
         }
       } catch (err) {
-        console.error("Error checking email:", err);
+        if (active) setEmailAvailable(null);
       } finally {
-        setCheckingEmail(false);
+        if (active) setCheckingEmail(false);
       }
-    }, 500); // Wait 500ms after user stops typing
-
-    return () => clearTimeout(timeoutId);
+    }, 500);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [email]);
   
   const handleSubmit = async (e) => {

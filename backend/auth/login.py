@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify, session
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import db, User
 from sqlalchemy.exc import IntegrityError
@@ -6,9 +8,13 @@ import re
 
 auth = Blueprint("auth", __name__)
 
+# initialize rate limiter (prevent spam and brute force)
+limiter = Limiter(key_func=get_remote_address, storage_uri="memory://", default_limits=["200 per day", "50 per hour"])
+
 
 # Register route
 @auth.route("/register", methods=["POST"])
+@limiter.limit("10 per hour") # limit to 10 registration attempts per hour per IP
 def register():
     # Get JSON data from request
     data = request.get_json() or {}
@@ -46,6 +52,7 @@ def register():
 
 # Login route
 @auth.route("/login", methods=["POST"])
+@limiter.limit("20 per minute") # limit to 20 login attempts per hour per IP
 def login():
 
     # Get JSON data from request
@@ -93,6 +100,7 @@ def me():
 
 # New: check availability for username/email
 @auth.route("/check", methods=["POST"])
+@limiter.limit("20 per minute")
 def check_availability():
     data = request.get_json() or {}
     username = (data.get("username") or "").strip()
