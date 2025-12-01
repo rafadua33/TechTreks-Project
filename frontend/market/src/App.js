@@ -7,6 +7,7 @@ import Buy from "./pages/Buy";
 import Sell from "./pages/Sell";
 import Register from "./pages/Register";
 import Products from "./pages/Products"; // NEW: products listing page
+import ProductDetails from "./pages/ProductDetails"; // NEW: individual product detail page
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
         <Route path="/buy" element={<Buy />} />
   <Route path="/sell" element={<Sell />} />
   <Route path="/products" element={<Products />} />
+        {/* Route with dynamic :id parameter for individual product details */}
+        <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/register" element={<Register />} />
 
       </Routes>
