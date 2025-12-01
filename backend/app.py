@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from auth.login import auth as auth_bp, limiter
+from products.products import products_bp
 from models import db
 import logging
 import os
@@ -22,6 +23,7 @@ limiter.init_app(app)
 
 # Initialize/register Flask blueprints
 app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(products_bp, url_prefix="/products")
 
 
 # Create database tables if they don't exist
