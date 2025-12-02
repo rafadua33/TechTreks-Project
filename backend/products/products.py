@@ -1,10 +1,20 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, send_from_directory, current_app
 from models import db, Product, ProductImage, User
 from sqlalchemy import or_, and_
 import logging
+import os
+import time
+from werkzeug.utils import secure_filename
 
 products_bp = Blueprint("products", __name__)
 logger = logging.getLogger(__name__)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+UPLOAD_FOLDER = 'static/uploads'
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Helper: Check if user is authenticated
 def get_current_user_id():
@@ -138,40 +148,46 @@ def get_product(product_id):
             return jsonify({"error": "product not found"}), 404
         
         # Return full details with seller and images
-        return jsonify(product.to_dict(include_seller=True, include_images=True)), 200
-        
+
     except Exception as e:
         logger.error(f"Error getting product {product_id}: {e}")
         return jsonify({"error": "failed to get product"}), 500
+    
 
-
-# ============================================================================
-# POST /products - Create new product
-# ============================================================================
 @products_bp.route("", methods=["POST"])
 def create_product():
     """
     Create a new product listing
     Required fields: title, price, category, condition
     Optional fields: description, quantity, is_public
+    Supports both JSON and multipart/form-data (for image uploads)
     """
     user_id, error = require_auth()
     if error:
         return error
     
     try:
-        data = request.get_json() or {}
+        # Handle both JSON and Form Data
+        if request.is_json:
+            data = request.get_json() or {}
+        else:
+            data = request.form
         
         # Validate required fields
         title = (data.get('title') or '').strip()
-        price = data.get('price')
+        # Handle price conversion from string if coming from form data
+        try:
+            price = float(data.get('price', 0))
+        except (ValueError, TypeError):
+            return jsonify({"error": "valid price is required"}), 400
+
         category = (data.get('category') or '').strip()
         condition = (data.get('condition') or '').strip()
         
         if not title:
             return jsonify({"error": "title is required"}), 400
         
-        if not price or price <= 0:
+        if price <= 0:
             return jsonify({"error": "valid price is required"}), 400
         
         if not category:
@@ -183,8 +199,17 @@ def create_product():
         
         # Validate optional fields
         description = (data.get('description') or '').strip()
-        quantity = data.get('quantity', 1)
-        is_public = data.get('is_public', True)
+        try:
+            quantity = int(data.get('quantity', 1))
+        except (ValueError, TypeError):
+            quantity = 1
+            
+        # Handle boolean from form data (which sends 'true'/'false' strings)
+        is_public_val = data.get('is_public', True)
+        if isinstance(is_public_val, str):
+            is_public = is_public_val.lower() == 'true'
+        else:
+            is_public = bool(is_public_val)
         
         if quantity < 0:
             return jsonify({"error": "quantity must be non-negative"}), 400
@@ -203,6 +228,35 @@ def create_product():
         )
         
         db.session.add(product)
+        # Flush to get the product ID if needed, though we use timestamp for filename
+        db.session.flush() 
+        
+        # Handle Image Upload
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                timestamp = int(time.time())
+                unique_filename = f"{timestamp}_{filename}"
+                
+                # Ensure upload directory exists
+                upload_path = os.path.join(current_app.root_path, UPLOAD_FOLDER)
+                if not os.path.exists(upload_path):
+                    os.makedirs(upload_path)
+                
+                file.save(os.path.join(upload_path, unique_filename))
+                
+                # Create ProductImage
+                # URL format: /products/uploads/<filename>
+                image_url = f"/products/uploads/{unique_filename}"
+                
+                product_image = ProductImage(
+                    product=product,
+                    url=image_url,
+                    is_primary=True
+                )
+                db.session.add(product_image)
+
         db.session.commit()
         
         logger.info(f"User {user_id} created product {product.id}")
@@ -217,6 +271,16 @@ def create_product():
         db.session.rollback()
         logger.error(f"Error creating product: {e}")
         return jsonify({"error": "failed to create product"}), 500
+
+
+# ============================================================================
+# GET /products/uploads/<filename> - Serve uploaded images
+# ============================================================================
+@products_bp.route("/uploads/<filename>")
+def uploaded_file(filename):
+    """Serve uploaded files"""
+    upload_path = os.path.join(current_app.root_path, UPLOAD_FOLDER)
+    return send_from_directory(upload_path, filename)
 
 
 # ============================================================================
