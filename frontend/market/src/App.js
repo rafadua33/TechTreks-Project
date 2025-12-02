@@ -6,12 +6,15 @@ import LoginPage from "./pages/LoginPage";
 import Buy from "./pages/Buy";
 import Sell from "./pages/Sell";
 import Register from "./pages/Register";
-import Products from "./pages/Products"; // NEW: products listing page
+import Products from "./pages/Products";
+
+// 👇 ADD THESE TWO IMPORTS
+import CreateProduct from "./pages/CreateProduct";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   return (
-    <div 
-    className="bg-[#000328] min-h-screen">
+    <div className="bg-[#000328] min-h-screen">
       <Navbar />
       <Routes>
         <Route
@@ -25,10 +28,14 @@ function App() {
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/buy" element={<Buy />} />
-  <Route path="/sell" element={<Sell />} />
-  <Route path="/products" element={<Products />} />
+        <Route path="/sell" element={<Sell />} />
+        <Route path="/products" element={<Products />} />
+        
+        {/* 👇 ADD THESE TWO ROUTES */}
+        <Route path="/products/create" element={<CreateProduct />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
+        
         <Route path="/register" element={<Register />} />
-
       </Routes>
     </div>
   );
