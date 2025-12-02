@@ -43,3 +43,27 @@ def send_message():
     db.session.add(msg)
     db.session.commit()
     return jsonify(msg.to_dict()), 201
+
+@messages_bp.route("/messages/inbox", methods=["GET"])
+def get_inbox():
+    # Accepts 'recipient' (id or username) or 'recipient_username' / 'user'
+    raw = request.args.get("recipient") or request.args.get("recipient_username") or request.args.get("user")
+    if raw is None:
+        return jsonify({"error": "recipient query param required (id or username)"}), 400
+
+    # resolve_user_param already converts username -> id
+    rid = resolve_user_param(raw)
+    if not rid:
+        return jsonify({"error": "recipient not found"}), 404
+
+    # fetch messages where recipient == rid (newest first)
+    msgs = Message.query.filter(Message.recipient_id == rid).order_by(Message.created_at.desc()).all()
+
+    # include sender_username for convenience
+    out = []
+    for m in msgs:
+        d = m.to_dict()
+        s = User.query.get(m.sender_id)
+        d["sender_username"] = s.username if s else None
+        out.append(d)
+    return jsonify(out)
