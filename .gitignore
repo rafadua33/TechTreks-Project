@@ -32,3 +32,6 @@ env/
 
 # test file
 test_db_setup.py
+tmp_untracked_backups/
+tmp_merge_backups/
+

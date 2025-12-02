@@ -3,41 +3,59 @@ import { useParams, useNavigate } from "react-router-dom";
 
 /**
  * ProductDetails Component
- * 
- * Displays detailed information about a single product.
+ *
  * Route: /products/:id
- * 
- * Features:
- * - Large product image
- * - Product name, price, description
- * - Seller information (placeholder for now)
- * - Back navigation to products list
- * - Contact seller button (placeholder for future messaging feature)
+ *
+ * - Loads product from backend (falls back to mock)
+ * - Shows product details, seller info
+ * - Contact Seller: requires login, prevents contacting yourself, navigates to /chat/:me/:other
+ * - View Messages: visible to seller only; opens a simple modal listing messages sent to them with Reply buttons
  */
 const ProductDetails = () => {
-  // Get the product ID from URL parameters (e.g., /products/3 -> id = "3")
   const { id } = useParams();
-  
-  // Hook for programmatic navigation
   const navigate = useNavigate();
-  
-  // State to hold the product data
+
+  // Product state
   const [product, setProduct] = useState(null);
-  
-  // State to track loading status
   const [loading, setLoading] = useState(true);
-  
-  // State to track if product was not found
   const [notFound, setNotFound] = useState(false);
 
-  // Mock product data (same as Products.jsx - will be replaced with API call later)
+  // ---- Seller messages / auth state (top-level hooks) ----
+  const [me, setMe] = useState(null);
+  const [messagesOpen, setMessagesOpen] = useState(false);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesList, setMessagesList] = useState([]);
+  const [messagesError, setMessagesError] = useState(null);
+
+  // Fetch current user on mount (keep UI responsive)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("http://localhost:5001/auth/me", { credentials: "include" });
+        if (!res.ok) return;
+        const raw = await res.json();
+        if (cancelled) return;
+        setMe(raw?.user ?? raw);
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  // --------------------------------------------------------
+
+  // Mock product data (fallback)
   const mockProducts = [
     {
       id: 1,
       name: "Vintage Camera",
       price: 120.0,
       imageUrl: "https://via.placeholder.com/600?text=Camera",
-      description: "Classic film camera in excellent condition. Perfect for photography enthusiasts and collectors. Comes with original leather case.",
+      description:
+        "Classic film camera in excellent condition. Perfect for photography enthusiasts and collectors. Comes with original leather case.",
       seller: "John Doe",
       location: "San Francisco, CA",
     },
@@ -46,7 +64,8 @@ const ProductDetails = () => {
       name: "Mountain Bike",
       price: 450.0,
       imageUrl: "https://via.placeholder.com/600?text=Bike",
-      description: "High-quality mountain bike with 21-speed gear system. Lightly used, well maintained. Great for trails and off-road adventures.",
+      description:
+        "High-quality mountain bike with 21-speed gear system. Lightly used, well maintained. Great for trails and off-road adventures.",
       seller: "Jane Smith",
       location: "Denver, CO",
     },
@@ -55,7 +74,8 @@ const ProductDetails = () => {
       name: "Gaming Laptop",
       price: 999.99,
       imageUrl: "https://via.placeholder.com/600?text=Laptop",
-      description: "Powerful gaming laptop with dedicated graphics card, 16GB RAM, and 512GB SSD. Runs all modern games smoothly.",
+      description:
+        "Powerful gaming laptop with dedicated graphics card, 16GB RAM, and 512GB SSD. Runs all modern games smoothly.",
       seller: "Mike Johnson",
       location: "Austin, TX",
     },
@@ -64,7 +84,8 @@ const ProductDetails = () => {
       name: "Smart Watch",
       price: 199.5,
       imageUrl: "https://via.placeholder.com/600?text=Watch",
-      description: "Feature-rich smartwatch with heart rate monitor, GPS, and waterproof design. Compatible with iOS and Android.",
+      description:
+        "Feature-rich smartwatch with heart rate monitor, GPS, and waterproof design. Compatible with iOS and Android.",
       seller: "Sarah Williams",
       location: "Seattle, WA",
     },
@@ -73,7 +94,8 @@ const ProductDetails = () => {
       name: "Desk Lamp",
       price: 35.25,
       imageUrl: "https://via.placeholder.com/600?text=Lamp",
-      description: "Modern LED desk lamp with adjustable brightness and color temperature. Energy efficient and perfect for home office.",
+      description:
+        "Modern LED desk lamp with adjustable brightness and color temperature. Energy efficient and perfect for home office.",
       seller: "Tom Brown",
       location: "Portland, OR",
     },
@@ -82,39 +104,210 @@ const ProductDetails = () => {
       name: "Noise-Cancelling Headphones",
       price: 250.0,
       imageUrl: "https://via.placeholder.com/600?text=Headphones",
-      description: "Premium wireless headphones with active noise cancellation. Superior sound quality and comfortable for long wear.",
+      description:
+        "Premium wireless headphones with active noise cancellation. Superior sound quality and comfortable for long wear.",
       seller: "Emily Davis",
       location: "New York, NY",
     },
   ];
 
-  // useEffect runs when component mounts or when 'id' changes
+  // Fetch product when id changes
   useEffect(() => {
-    // Simulate API fetch delay (replace with real fetch later)
-    const fetchProduct = () => {
+    let cancelled = false;
+
+    async function fetchProduct() {
       setLoading(true);
-      
-      // Simulate network delay
-      setTimeout(() => {
-        // Find product by ID (convert string id from URL to number)
-        const foundProduct = mockProducts.find((p) => p.id === parseInt(id));
-        
-        if (foundProduct) {
-          setProduct(foundProduct);
+      setNotFound(false);
+
+      try {
+        const res = await fetch(`http://localhost:5001/products/${encodeURIComponent(id)}`, {
+          credentials: "include",
+        });
+        if (cancelled) return;
+
+        if (res.ok) {
+          const data = await res.json();
+          const serverProduct = data.product || data;
+          setProduct(serverProduct);
           setNotFound(false);
-        } else {
-          // Product with this ID doesn't exist
+          setLoading(false);
+          return;
+        } else if (res.status === 404) {
           setNotFound(true);
+          setLoading(false);
+          return;
         }
-        
-        setLoading(false);
-      }, 500); // 500ms delay to simulate network request
-    };
+      } catch (err) {
+        console.debug("Product API fetch failed, falling back to mock:", err);
+      }
+
+      // Fallback to mock
+      const foundProduct = mockProducts.find((p) => p.id === parseInt(id));
+      if (foundProduct) {
+        setProduct(foundProduct);
+        setNotFound(false);
+      } else {
+        setNotFound(true);
+      }
+      setLoading(false);
+    }
 
     fetchProduct();
-  }, [id]); // Re-run effect if product ID changes
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
-  // Show loading spinner while fetching data
+  // Contact seller handler
+  const handleContactSeller = async () => {
+    if (!product) return;
+
+    try {
+      const res = await fetch("http://localhost:5001/auth/me", {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const goLogin = window.confirm("You must be logged in to contact sellers. Go to login page?");
+        if (goLogin) navigate("/login");
+        return;
+      }
+
+      const raw = await res.json();
+      const meLocal = raw?.user ?? raw;
+
+      if (!meLocal || (!meLocal.username && !meLocal.id)) {
+        const goLogin = window.confirm("Your session looks invalid. Please log in to contact sellers. Go to login page?");
+        if (goLogin) navigate("/login");
+        return;
+      }
+
+      const sellerUsername = product?.seller?.username ?? product?.seller;
+      const sellerId = product?.seller?.id ?? product?.seller?.user_id ?? null;
+
+      if (!sellerUsername && !sellerId) {
+        alert("Seller information is unavailable for this product.");
+        return;
+      }
+
+      const isSameByUsername = meLocal.username && sellerUsername && meLocal.username === sellerUsername;
+      const isSameById = meLocal.id && sellerId && Number(meLocal.id) === Number(sellerId);
+
+      if (isSameByUsername || isSameById) {
+        alert("You can't contact yourself.");
+        return;
+      }
+
+      const meParam = encodeURIComponent(meLocal.username ?? meLocal.id);
+      const otherParam = encodeURIComponent(sellerUsername ?? sellerId);
+
+      navigate(`/chat/${meParam}/${otherParam}`);
+    } catch (err) {
+      console.error("Contact seller failed:", err);
+      alert("Unable to contact the seller right now. Please try again later.");
+    }
+  };
+
+  // View messages (seller-only) - opens modal with messages addressed to seller
+  const handleViewMessages = async () => {
+    if (!product) return;
+
+    try {
+      // Ensure we have current user
+      if (!me) {
+        const r = await fetch("http://localhost:5001/auth/me", { credentials: "include" });
+        if (!r.ok) {
+          alert("You must be logged in to view your messages.");
+          return;
+        }
+        const raw = await r.json();
+        setMe(raw?.user ?? raw);
+      }
+
+      const sellerUsername = product?.seller?.username ?? product?.seller;
+      const sellerId = product?.seller?.id ?? product?.seller?.user_id ?? null;
+
+      const isSameByUsername = me?.username && sellerUsername && me.username === sellerUsername;
+      const isSameById = me?.id && sellerId && Number(me.id) === Number(sellerId);
+      if (!isSameByUsername && !isSameById) {
+        alert("Only the seller can view messages sent to them.");
+        return;
+      }
+
+      setMessagesLoading(true);
+      setMessagesError(null);
+      setMessagesList([]);
+
+      const target = encodeURIComponent(sellerId ?? sellerUsername ?? "");
+      const attemptUrls = [
+        `http://localhost:5001/api/messages/inbox?recipient=${target}`,
+      ];
+
+      let got = null;
+      for (const url of attemptUrls) {
+        try {
+          const r = await fetch(url, { credentials: "include" });
+          if (!r.ok) continue;
+          const d = await r.json();
+          if (Array.isArray(d)) {
+            got = d;
+          } else if (Array.isArray(d.messages)) {
+            got = d.messages;
+          } else if (Array.isArray(d.data)) {
+            got = d.data;
+          } else {
+            const nested = d.messages?.data;
+            if (Array.isArray(nested)) got = nested;
+          }
+          if (got) break;
+        } catch (e) {
+          // try next url
+        }
+      }
+
+      if (!got) {
+        setMessagesError("No messages found or the messages endpoint is not available.");
+        setMessagesLoading(false);
+        setMessagesOpen(true);
+        return;
+      }
+
+      const normalized = got.map((m) => ({
+        id: m.id ?? m.message_id ?? m._id ?? null,
+        text: m.text ?? m.body ?? m.message ?? "",
+        sender_username: m.sender_username ?? m.from_username ?? m.sender ?? null,
+        sender_id: m.sender_id ?? m.from_id ?? m.from ?? null,
+        timestamp: m.created_at ?? m.timestamp ?? m.ts ?? m.created ?? null,
+        raw: m,
+      }));
+
+      setMessagesList(normalized);
+      setMessagesLoading(false);
+      setMessagesOpen(true);
+    } catch (err) {
+      console.error("View messages failed:", err);
+      setMessagesError("Unable to fetch messages right now.");
+      setMessagesLoading(false);
+      setMessagesOpen(true);
+    }
+  };
+
+  // Backend base for uploaded images
+  const BACKEND = "http://localhost:5001";
+
+  // Resolve image src; handle server-relative uploaded paths
+  const imageSrc =
+    product?.imageUrl ??
+    (product?.thumbnail_url
+      ? product.thumbnail_url.startsWith("http")
+        ? product.thumbnail_url
+        : `${BACKEND}${product.thumbnail_url}`
+      : product?.images && product.images[0]?.url
+      ? product.images[0].url.startsWith("http")
+        ? product.images[0].url
+        : `${BACKEND}${product.images[0].url}`
+      : "https://via.placeholder.com/600?text=No+Image");
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -126,15 +319,12 @@ const ProductDetails = () => {
     );
   }
 
-  // Show error message if product not found
   if (notFound) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
-          <p className="text-gray-400 mb-6">
-            The product you're looking for doesn't exist.
-          </p>
+          <p className="text-gray-400 mb-6">The product you're looking for doesn't exist.</p>
           <button
             onClick={() => navigate("/products")}
             className="px-6 py-2 bg-[#E0B0FF] text-gray-900 rounded-lg hover:opacity-90 transition"
@@ -146,11 +336,9 @@ const ProductDetails = () => {
     );
   }
 
-  // Main product details view
   return (
     <div className="min-h-screen bg-gray-900 text-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
-        {/* Back button */}
         <button
           onClick={() => navigate("/products")}
           className="mb-6 text-[#E0B0FF] hover:underline flex items-center gap-2"
@@ -158,57 +346,48 @@ const ProductDetails = () => {
           ← Back to Products
         </button>
 
-        {/* Product details grid - 2 columns on larger screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left column: Image */}
           <div className="bg-gray-800 rounded-lg overflow-hidden">
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-auto object-cover"
-            />
+            <img src={imageSrc} alt={product?.name} className="w-full h-auto object-cover" />
           </div>
 
-          {/* Right column: Product info */}
           <div className="flex flex-col gap-6">
-            {/* Product name */}
-            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <h1 className="text-3xl font-bold">{product?.name}</h1>
 
-            {/* Price - large and prominent */}
-            <div className="text-4xl font-bold text-[#E0B0FF]">
-              ${product.price.toFixed(2)}
-            </div>
+            <div className="text-4xl font-bold text-[#E0B0FF]">${Number(product?.price ?? 0).toFixed(2)}</div>
 
-            {/* Description section */}
             <div>
               <h2 className="text-xl font-semibold mb-2">Description</h2>
-              <p className="text-gray-300 leading-relaxed">
-                {product.description}
-              </p>
+              <p className="text-gray-300 leading-relaxed">{product?.description}</p>
             </div>
 
-            {/* Seller information section */}
             <div className="border-t border-gray-700 pt-4">
               <h2 className="text-xl font-semibold mb-2">Seller Information</h2>
               <p className="text-gray-300">
-                <span className="font-medium">Name:</span> {product.seller}
+                <span className="font-medium">Name:</span>{" "}
+                {product?.seller?.username ?? product?.seller ?? "Unknown"}
               </p>
               <p className="text-gray-300">
-                <span className="font-medium">Location:</span> {product.location}
+                <span className="font-medium">Location:</span>{" "}
+                {product?.seller?.location ?? product?.location ?? "Unknown"}
               </p>
             </div>
 
-            {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-4">
-              {/* Contact seller button (placeholder - will integrate messaging later) */}
               <button
                 className="flex-1 py-3 bg-[#E0B0FF] text-gray-900 rounded-lg font-semibold hover:opacity-90 transition"
-                onClick={() => alert("Contact seller feature coming soon!")}
+                onClick={handleContactSeller}
               >
                 Contact Seller
               </button>
-              
-              {/* Add to favorites button (placeholder for future feature) */}
+
+              <button
+                className="flex-1 py-3 bg-[#4B5563] text-white rounded-lg font-semibold hover:bg-gray-600 transition"
+                onClick={handleViewMessages}
+              >
+                View Messages
+              </button>
+
               <button
                 className="flex-1 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition"
                 onClick={() => alert("Add to favorites feature coming soon!")}
@@ -216,6 +395,76 @@ const ProductDetails = () => {
                 Save
               </button>
             </div>
+
+            {messagesOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                <div className="w-full max-w-2xl bg-gray-800 rounded-lg p-6 text-white">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold">Messages to you</h3>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+                        onClick={() => {
+                          setMessagesOpen(false);
+                          setMessagesList([]);
+                          setMessagesError(null);
+                        }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+
+                  {messagesLoading && <p className="text-gray-400">Loading messages...</p>}
+                  {messagesError && <p className="text-red-400">{messagesError}</p>}
+                  {!messagesLoading && !messagesError && messagesList.length === 0 && (
+                    <p className="text-gray-400">No messages yet.</p>
+                  )}
+
+                  <ul className="space-y-3 max-h-72 overflow-auto">
+                    {messagesList.map((m) => (
+                      <li key={m.id ?? Math.random()} className="p-3 bg-gray-900 rounded">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="text-sm text-gray-300">
+                              From:{" "}
+                              <span className="font-medium text-white">
+                                {m.sender_username ?? m.sender_id ?? "Unknown"}
+                              </span>
+                            </div>
+                            <div className="text-sm text-gray-400 mt-1">{m.text}</div>
+                            {m.timestamp && (
+                              <div className="text-xs text-gray-500 mt-2">
+                                {isNaN(new Date(m.timestamp).getTime())
+                                  ? String(m.timestamp)
+                                  : new Date(m.timestamp).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="ml-4 flex flex-col gap-2">
+                            <button
+                              className="px-3 py-1 bg-[#E0B0FF] text-gray-900 rounded hover:opacity-90"
+                              onClick={() => {
+                                const meParam = encodeURIComponent(me?.username ?? me?.id ?? "");
+                                const otherParam = encodeURIComponent(m.sender_username ?? m.sender_id ?? "");
+                                if (!meParam) {
+                                  alert("Please log in to reply.");
+                                  return;
+                                }
+                                navigate(`/chat/${meParam}/${otherParam}`);
+                              }}
+                            >
+                              Reply
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -148,6 +148,7 @@ def get_product(product_id):
             return jsonify({"error": "product not found"}), 404
         
         # Return full details with seller and images
+        return jsonify(product.to_dict(include_seller=True, include_images=True)), 200
 
     except Exception as e:
         logger.error(f"Error getting product {product_id}: {e}")

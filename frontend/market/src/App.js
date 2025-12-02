@@ -7,9 +7,8 @@ import Buy from "./pages/Buy";
 import Sell from "./pages/Sell";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
-
-// 👇 ADD THESE TWO IMPORTS
 import CreateProduct from "./pages/CreateProduct";
+import ChatWindow from "./components/ChatWindow";
 import ProductDetails from "./pages/ProductDetails";
 
 function App() {
@@ -30,12 +29,11 @@ function App() {
         <Route path="/buy" element={<Buy />} />
         <Route path="/sell" element={<Sell />} />
         <Route path="/products" element={<Products />} />
-        
-        {/* 👇 ADD THESE TWO ROUTES */}
         <Route path="/products/create" element={<CreateProduct />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/chat/:me/:other" element={<ChatWindow />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         
-        <Route path="/register" element={<Register />} />
       </Routes>
     </div>
   );
