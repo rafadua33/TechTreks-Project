@@ -215,7 +215,7 @@ export default function ChatWindow() {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) handleSend(e); }}
         />
-        <button type="submit" className="px-4 py-2 rounded-md bg-[#E0B0FF] text-white rounded-xl"><IoSend /></button>
+        <button type="submit" className="px-4 py-2 bg-[#E0B0FF] text-white rounded-xl"><IoSend /></button>
       </form>
     </div>
   );
