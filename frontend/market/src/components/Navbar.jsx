@@ -57,13 +57,13 @@ const Navbar = () => {
          */}
          <img src={"/images/top.png"} alt="Top" className="h-8 md:h-10 w-auto ml-6 mt-6 -mb-2" />
         <ul className="uppercase p-4">
-          <li className="p-4 border-b border-gray-600 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
+          <li className="p-4 border-b border-gray-600/50 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
             onClick={() => {navigate("/"); handleNav(); }}>Home</li>
-          <li className="p-4 border-b border-gray-600 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
+          <li className="p-4 border-b border-gray-600/50 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
             onClick={() => {navigate("/login"); handleNav(); }}>Login</li>
           {/* <li className="p-4 border-b border-gray-600 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
             onClick={() => {navigate("/buy"); handleNav(); }}>Buy</li> */}
-          <li className="p-4 border-b border-gray-600 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
+          <li className="p-4 border-b border-gray-600/50 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
             onClick={() => {navigate("/products"); handleNav(); }}>Products</li>
           {/* <li className="p-4 hover:text-[#E0B0FF] transition duration = 300 cursor-pointer"
             onClick={() => {navigate("/sell"); handleNav(); }}>Sell</li> */}
