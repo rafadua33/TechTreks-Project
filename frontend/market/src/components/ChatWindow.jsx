@@ -165,15 +165,14 @@ export default function ChatWindow() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 bg-white/5 rounded-md min-h-[60vh] flex flex-col">
+    <div className="max-w-3xl mx-auto font-darker-grotesque p-4 bg-white/5 rounded-md min-h-[60vh] flex flex-col">
       <header className="pb-2 border-b border-white/10 mb-2 flex justify-between items-center">
         <div>
-          <h2 className="text-white text-lg">
-            Chat — you: {meName ?? me} • other: {other}
+          <h2 className="text-white text-xl font-bold">
+            {other}
           </h2>
-          <div className="text-xs text-white/60">Messages: {messages.length}</div>
         </div>
-        <div className="text-sm">
+        <div className="text-md">
           <span className={`px-2 py-1 rounded ${socketStatus === "connected" ? "bg-green-600" : "bg-red-600"}`}>
             {socketStatus}
           </span>
@@ -198,8 +197,8 @@ export default function ChatWindow() {
           return (
             <div key={m.id ?? `${m.sender_id}-${m.created_at}-${Math.random()}`} className={`mb-2 flex ${mine ? "justify-end" : "justify-start"}`}>
               <div className={`px-3 py-2 rounded-lg max-w-[75%] ${mine ? "bg-[#E0B0FF]/80 text-[#000328] rounded-xl" : "bg-white/10 text-white/90 rounded-xl border-[#E0B0FF]/50 border-2"}`}>
-                <div className="text-sm">{m.body}</div>
-                <div className="text-xs mt-1">{new Date(m.created_at || Date.now()).toLocaleString()}</div>
+                <div className="text-md">{m.body}</div>
+                <div className="text-xs text-[#000328]/70">{new Date(m.created_at || Date.now()).toLocaleString()}</div>
               </div>
             </div>
           );

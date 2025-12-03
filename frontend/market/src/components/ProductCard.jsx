@@ -25,7 +25,7 @@ const ProductCard = ({ product }) => {
     // Entire card is clickable - improves UX
     // cursor-pointer shows it's interactive
     <div 
-      className="rounded-lg overflow-hidden shadow-md bg-gray-800 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="rounded-lg font-darker-grotesqueoverflow-hidden shadow-md bg-gray-800 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
       onClick={handleViewDetails}
     >
       {/* Product image section */}

@@ -5,7 +5,12 @@ module.exports = {
     "./public/index.html"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        // adds a utility class `font-darker-grotesque`
+        'darker-grotesque': ['"Darker Grotesque"', 'sans-serif']
+      }
+    },
   },
   plugins: [],
 }

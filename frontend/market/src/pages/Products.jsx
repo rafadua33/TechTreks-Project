@@ -49,10 +49,10 @@ const Products = () => {
     <div className="bg-[#000328] min-h-screen text-white px-6 py-10">
       {/* Header Section - ALWAYS VISIBLE */}
       <div className="flex justify-between items-center mb-8 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-white">Products</h1>
+        <h1 className="text-4xl font-darker-grotesque font-bold text-white">Products</h1>
         <button
           onClick={() => navigate("/products/create")}
-          className="bg-purple-600 text-white px-6 py-2 rounded font-semibold hover:bg-purple-700 transition-colors shadow-lg shadow-purple-900/50"
+          className="bg-[#e0b0ff] text-[#000328] text-xl px-6 py-1 rounded font-darker-grotesque hover:bg-transparent border-2 border-transparent hover:border-[#E0B0FF] hover:text-[#e0b0ff] shadow-purple-900/50 transition duration-300 "
         >
           + Create Product
         </button>
@@ -84,13 +84,13 @@ const Products = () => {
 
         {/* 3. Empty State */}
         {!loading && !error && products.length === 0 && (
-          <div className="text-center py-20 bg-[#0a0e35] rounded-lg">
-            <p className="text-xl mb-4">No products available yet.</p>
+          <div className="text-center py-20 font-darker-grotesquebg-[#0a0e35] rounded-lg">
+            <p className="text-2xl mb-4">No products available yet.</p>
             <p className="text-purple-300 mb-6">Be the first to list a product!</p>
             {/* Optional: Another button here for convenience */}
             <button
               onClick={() => navigate("/products/create")}
-              className="text-purple-400 hover:underline"
+              className="text-[#e0b0ff] hover:underline"
             >
               Create one now &rarr;
             </button>
