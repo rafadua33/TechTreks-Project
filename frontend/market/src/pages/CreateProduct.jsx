@@ -88,8 +88,8 @@ const CreateProduct = () => {
 
   return (
     <div className="bg-[#000328] min-h-screen text-white px-6 py-10">
-      <div className="max-w-2xl mx-auto bg-[#0a0e35] p-8 rounded-xl shadow-2xl border border-purple-900/30">
-        <h1 className="text-3xl font-bold mb-8 text-purple-100">List a New Product</h1>
+      <div className="max-w-2xl mx-auto bg-[#0a0e35] p-8 rounded-xl shadow-2xl border border-[#E0B0FF]/30">
+        <h1 className="text-3xl font-bold mb-8 text-[#E0B0FF]">List a New Product</h1>
 
         {error && (
           <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded mb-6">
@@ -100,33 +100,33 @@ const CreateProduct = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2 text-purple-200">Product Image</label>
+            <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Product Image</label>
             <div className="flex items-center space-x-4">
-              <div className="w-32 h-32 bg-[#1a1d4d] border-2 border-dashed border-purple-500/50 rounded-lg flex items-center justify-center overflow-hidden relative group">
+              <div className="w-32 h-32 bg-[#1a1d4d] border-2 border-dashed border-[#E0B0FF]/50 rounded-lg flex items-center justify-center overflow-hidden relative group">
                 {previewUrl ? (
                   <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-purple-400 text-sm">No image</span>
+                  <span className="text-[#E0B0FF]/70 text-sm">No image</span>
                 )}
               </div>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer"
+                className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#E0B0FF] file:text-[#000328] hover:file:bg-[#E0B0FF]/80 cursor-pointer"
               />
             </div>
           </div>
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-purple-200">Title <span className="text-purple-500">*</span></label>
+            <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Title <span className="text-[#E0B0FF]">*</span></label>
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full px-4 py-2 bg-[#1a1d4d] border border-purple-900/50 rounded focus:outline-none focus:border-purple-500 text-white placeholder-purple-400/30"
+              className="w-full px-4 py-2 bg-[#1a1d4d] border border-[#E0B0FF]/30 rounded focus:outline-none focus:border-[#E0B0FF] text-white placeholder-[#E0B0FF]/30"
               placeholder="Enter product title"
               required
             />
@@ -134,13 +134,13 @@ const CreateProduct = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-purple-200">Description</label>
+            <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Description</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-2 bg-[#1a1d4d] border border-purple-900/50 rounded focus:outline-none focus:border-purple-500 text-white placeholder-purple-400/30"
+              className="w-full px-4 py-2 bg-[#1a1d4d] border border-[#E0B0FF]/30 rounded focus:outline-none focus:border-[#E0B0FF] text-white placeholder-[#E0B0FF]/30"
               placeholder="Describe your product..."
             />
           </div>
@@ -148,7 +148,7 @@ const CreateProduct = () => {
           {/* Price and Quantity */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2 text-purple-200">Price ($) <span className="text-purple-500">*</span></label>
+              <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Price ($) <span className="text-[#E0B0FF]">*</span></label>
               <input
                 type="number"
                 name="price"
@@ -156,20 +156,20 @@ const CreateProduct = () => {
                 onChange={handleChange}
                 step="0.01"
                 min="0.01"
-                className="w-full px-4 py-2 bg-[#1a1d4d] border border-purple-900/50 rounded focus:outline-none focus:border-purple-500 text-white placeholder-purple-400/30"
+                className="w-full px-4 py-2 bg-[#1a1d4d] border border-[#E0B0FF]/30 rounded focus:outline-none focus:border-[#E0B0FF] text-white placeholder-[#E0B0FF]/30"
                 placeholder="0.00"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-purple-200">Quantity <span className="text-purple-500">*</span></label>
+              <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Quantity <span className="text-[#E0B0FF]">*</span></label>
               <input
                 type="number"
                 name="quantity"
                 value={formData.quantity}
                 onChange={handleChange}
                 min="1"
-                className="w-full px-4 py-2 bg-[#1a1d4d] border border-purple-900/50 rounded focus:outline-none focus:border-purple-500 text-white"
+                className="w-full px-4 py-2 bg-[#1a1d4d] border border-[#E0B0FF]/30 rounded focus:outline-none focus:border-[#E0B0FF] text-white"
                 required
               />
             </div>
@@ -178,12 +178,12 @@ const CreateProduct = () => {
           {/* Category & Condition */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2 text-purple-200">Category <span className="text-purple-500">*</span></label>
+              <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Category <span className="text-[#E0B0FF]">*</span></label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-[#1a1d4d] border border-purple-900/50 rounded focus:outline-none focus:border-purple-500 text-white"
+                className="w-full px-4 py-2 bg-[#1a1d4d] border border-[#E0B0FF]/30 rounded focus:outline-none focus:border-[#E0B0FF] text-white"
                 required
               >
                 <option value="">Select...</option>
@@ -193,12 +193,12 @@ const CreateProduct = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-purple-200">Condition <span className="text-purple-500">*</span></label>
+              <label className="block text-sm font-medium mb-2 text-[#E0B0FF]">Condition <span className="text-[#E0B0FF]">*</span></label>
               <select
                 name="condition"
                 value={formData.condition}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-[#1a1d4d] border border-purple-900/50 rounded focus:outline-none focus:border-purple-500 text-white"
+                className="w-full px-4 py-2 bg-[#1a1d4d] border border-[#E0B0FF]/30 rounded focus:outline-none focus:border-[#E0B0FF] text-white"
                 required
               >
                 {conditions.map(cond => (
@@ -209,15 +209,15 @@ const CreateProduct = () => {
           </div>
 
           {/* Public Toggle */}
-          <div className="flex items-center p-4 bg-[#1a1d4d] rounded-lg border border-purple-900/30">
+          <div className="flex items-center p-4 bg-[#1a1d4d] rounded-lg border border-[#E0B0FF]/30">
             <input
               type="checkbox"
               name="is_public"
               checked={formData.is_public}
               onChange={handleChange}
-              className="w-5 h-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500"
+              className="w-5 h-5 text-[#E0B0FF] bg-gray-800 border-gray-600 rounded focus:ring-[#E0B0FF]"
             />
-            <label className="ml-3 text-sm text-purple-100">Make this product publicly visible</label>
+            <label className="ml-3 text-sm text-[#E0B0FF]">Make this product publicly visible</label>
           </div>
 
           {/* Buttons */}
@@ -225,7 +225,7 @@ const CreateProduct = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-all shadow-lg shadow-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-[#E0B0FF] text-[#000328] px-6 py-3 rounded-lg font-semibold hover:bg-[#E0B0FF]/80 transition-all shadow-lg shadow-[#E0B0FF]/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Creating..." : "Create Product"}
             </button>
@@ -233,7 +233,7 @@ const CreateProduct = () => {
             <button
               type="button"
               onClick={() => navigate("/products")}
-              className="px-6 py-3 bg-[#1a1d4d] text-purple-200 border border-purple-900/50 rounded-lg hover:bg-[#252965] transition-colors"
+              className="px-6 py-3 bg-[#1a1d4d] text-[#E0B0FF] border border-[#E0B0FF]/30 rounded-lg hover:bg-[#252965] transition-colors"
             >
               Cancel
             </button>
