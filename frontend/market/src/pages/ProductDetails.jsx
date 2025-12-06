@@ -127,7 +127,22 @@ const ProductDetails = () => {
 
         if (res.ok) {
           const data = await res.json();
-          const serverProduct = data.product || data;
+          // Backend returns product directly (not wrapped in { product: ... })
+          // Map backend field names to frontend expectations
+          const serverProduct = {
+            id: data.id,
+            name: data.title, // Backend uses 'title', frontend expects 'name'
+            price: data.price,
+            imageUrl: data.images?.length > 0 ? data.images[0].url : data.thumbnail_url,
+            description: data.description,
+            seller: data.seller?.username || data.seller, // Handle seller object or string
+            location: data.location || "Location not specified",
+            condition: data.condition,
+            quantity: data.quantity,
+            status: data.status,
+            created_at: data.created_at,
+            ...data // Spread all backend fields in case frontend needs them
+          };
           setProduct(serverProduct);
           setNotFound(false);
           setLoading(false);
