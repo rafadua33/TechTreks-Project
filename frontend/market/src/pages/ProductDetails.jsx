@@ -135,11 +135,24 @@ const ProductDetails = () => {
           const data = await res.json();
           // Backend returns product directly (not wrapped in { product: ... })
           // Map backend field names to frontend expectations
+          
+          // Construct full image URL from backend response
+          // Backend returns relative paths like "/products/uploads/filename.jpg"
+          // Need to prepend the backend URL to make them absolute for img src
+          let imageUrl = "https://via.placeholder.com/600?text=No+Image";
+          const imageFromData = data.images?.length > 0 ? data.images[0].url : data.thumbnail_url;
+          if (imageFromData) {
+            // If URL is relative (starts with /), prepend backend URL
+            imageUrl = imageFromData.startsWith("http") 
+              ? imageFromData 
+              : `http://localhost:5001${imageFromData}`;
+          }
+          
           const serverProduct = {
             id: data.id,
             name: data.title, // Backend uses 'title', frontend expects 'name'
             price: data.price,
-            imageUrl: data.images?.length > 0 ? data.images[0].url : data.thumbnail_url,
+            imageUrl: imageUrl,
             description: data.description,
             seller: data.seller?.username || data.seller, // Handle seller object or string
             location: data.location || "Location not specified",
