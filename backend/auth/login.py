@@ -131,9 +131,14 @@ def validate_registration_payload(data):
     if not re.match(r"^[A-Za-z0-9_.-]+$", username):
         return False, "username contains invalid characters"
 
-    # basic email check; use a proper validator for production
+    # Email validation: Must be valid format AND end with @nyu.edu
+    # Check for basic email format first
     if "@" not in email or len(email) > 254:
         return False, "invalid email"
+    
+    # Verify email domain is NYU (ends with @nyu.edu) - required for TechTreks community
+    if not email.endswith("@nyu.edu"):
+        return False, "only NYU email addresses are allowed (@nyu.edu)"
 
     # basic password checks
     if len(password) < 8:

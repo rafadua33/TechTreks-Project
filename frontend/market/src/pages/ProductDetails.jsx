@@ -27,6 +27,12 @@ const ProductDetails = () => {
   const [messagesList, setMessagesList] = useState([]);
   const [messagesError, setMessagesError] = useState(null);
 
+  // ---- Delete product state ----
+  // deleting: boolean flag to show loading state during deletion
+  // deleteError: error message if deletion fails
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+
   // Fetch current user on mount (keep UI responsive)
   useEffect(() => {
     let cancelled = false;
@@ -127,7 +133,35 @@ const ProductDetails = () => {
 
         if (res.ok) {
           const data = await res.json();
-          const serverProduct = data.product || data;
+          // Backend returns product directly (not wrapped in { product: ... })
+          // Map backend field names to frontend expectations
+          
+          // Construct full image URL from backend response
+          // Backend returns relative paths like "/products/uploads/filename.jpg"
+          // Need to prepend the backend URL to make them absolute for img src
+          let imageUrl = "https://via.placeholder.com/600?text=No+Image";
+          const imageFromData = data.images?.length > 0 ? data.images[0].url : data.thumbnail_url;
+          if (imageFromData) {
+            // If URL is relative (starts with /), prepend backend URL
+            imageUrl = imageFromData.startsWith("http") 
+              ? imageFromData 
+              : `http://localhost:5001${imageFromData}`;
+          }
+          
+          const serverProduct = {
+            id: data.id,
+            name: data.title, // Backend uses 'title', frontend expects 'name'
+            price: data.price,
+            imageUrl: imageUrl,
+            description: data.description,
+            seller: data.seller?.username || data.seller, // Handle seller object or string
+            location: data.location || "Location not specified",
+            condition: data.condition,
+            quantity: data.quantity,
+            status: data.status,
+            created_at: data.created_at,
+            ...data // Spread all backend fields in case frontend needs them
+          };
           setProduct(serverProduct);
           setNotFound(false);
           setLoading(false);
@@ -292,6 +326,47 @@ const ProductDetails = () => {
     }
   };
 
+  // Delete product handler - only available to the seller (product owner)
+  // Sends DELETE request to backend API endpoint, then redirects to /products on success
+  const handleDeleteProduct = async () => {
+    // Confirm deletion with user to prevent accidental removal
+    if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      // Send DELETE request to backend endpoint
+      // Must include credentials for session-based authentication
+      const res = await fetch(`http://localhost:5001/products/${encodeURIComponent(product.id)}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        // Handle different error cases:
+        // 401 = not authenticated, 403 = not the owner, 404 = product doesn't exist
+        throw new Error(errorData.error || `Failed to delete product (${res.status})`);
+      }
+
+      // Success: navigate back to products list
+      alert("Product deleted successfully!");
+      navigate("/products");
+    } catch (err) {
+      console.error("Delete product failed:", err);
+      // Show error message to user
+      setDeleteError(err.message || "Failed to delete product. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   // Backend base for uploaded images
   const BACKEND = "http://localhost:5001";
 
@@ -374,20 +449,42 @@ const ProductDetails = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-4">
-              <button
-                className="flex-1 py-3 bg-[#E0B0FF] text-gray-900 rounded-lg font-semibold hover:opacity-90 transition"
-                onClick={handleContactSeller}
-              >
-                Contact Seller
-              </button>
+              {/* Contact Seller - always visible for non-sellers */}
+              {!me || me?.id !== product?.seller?.id ? (
+                <button
+                  className="flex-1 py-3 bg-[#E0B0FF] text-gray-900 rounded-lg font-semibold hover:opacity-90 transition"
+                  onClick={handleContactSeller}
+                >
+                  Contact Seller
+                </button>
+              ) : null}
 
-              <button
-                className="flex-1 py-3 bg-[#4B5563] text-white rounded-lg font-semibold hover:bg-gray-600 transition"
-                onClick={handleViewMessages}
-              >
-                View Messages
-              </button>
+              {/* View Messages - seller only */}
+              {me && (me?.id === product?.seller?.id || me?.username === product?.seller?.username) && (
+                <button
+                  className="flex-1 py-3 bg-[#4B5563] text-white rounded-lg font-semibold hover:bg-gray-600 transition"
+                  onClick={handleViewMessages}
+                >
+                  View Messages
+                </button>
+              )}
 
+              {/* Delete Product - seller only; allows seller to remove their listing */}
+              {me && (me?.id === product?.seller?.id || me?.username === product?.seller?.username) && (
+                <button
+                  className={`flex-1 py-3 rounded-lg font-semibold transition ${
+                    deleting
+                      ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                      : "bg-red-600 text-white hover:bg-red-700"
+                  }`}
+                  onClick={handleDeleteProduct}
+                  disabled={deleting}
+                >
+                  {deleting ? "Deleting..." : "Delete Product"}
+                </button>
+              )}
+
+              {/* Save to Favorites */}
               <button
                 className="flex-1 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition"
                 onClick={() => alert("Add to favorites feature coming soon!")}
@@ -395,6 +492,14 @@ const ProductDetails = () => {
                 Save
               </button>
             </div>
+
+            {/* Show delete error if one occurred */}
+            {deleteError && (
+              <div className="p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200">
+                <p className="font-semibold">Error</p>
+                <p>{deleteError}</p>
+              </div>
+            )}
 
             {messagesOpen && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">

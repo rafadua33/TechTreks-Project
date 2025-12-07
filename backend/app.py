@@ -55,10 +55,12 @@ app.config.update(
 )
 
 
-# Allow localhost:3000 with credentials
+# Allow localhost:3000 and 3001 with credentials
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    origin = request.headers.get('Origin')
+    if origin in ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001']:
+        response.headers['Access-Control-Allow-Origin'] = origin
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
@@ -79,7 +81,7 @@ def welcome():
 # initialize Socket.IO (after app = Flask(__name__))
 socketio = SocketIO(
 app,
-    cors_allowed_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    cors_allowed_origins=["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"],
     manage_session=False,
     async_mode="gevent",
     logger=True,
