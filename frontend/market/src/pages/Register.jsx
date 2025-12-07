@@ -51,11 +51,21 @@ const Register = () => {
   }, [username]);
 
   // Debounce email check
+  // Frontend validation: check if email ends with @nyu.edu AND if it's available
   useEffect(() => {
     if (!email || !email.includes("@")) {
       setEmailAvailable(null);
       return;
     }
+    
+    // Check for NYU email domain first (client-side validation)
+    // This provides immediate feedback before checking backend availability
+    if (!email.toLowerCase().endsWith("@nyu.edu")) {
+      setEmailAvailable(false); // Mark as unavailable to show error
+      setCheckingEmail(false);
+      return;
+    }
+    
     let active = true;
     setCheckingEmail(true);
     const timer = setTimeout(async () => {
@@ -209,7 +219,10 @@ const Register = () => {
                 <span className="absolute right-3 top-2 text-red-500 text-xl">✗</span>
               )}
             </div>
-            {emailAvailable === false && (
+            {emailAvailable === false && !email.toLowerCase().endsWith("@nyu.edu") && email.includes("@") && (
+              <p className="text-red-400 text-sm mb-2">Please use an NYU email (@nyu.edu)</p>
+            )}
+            {emailAvailable === false && email.toLowerCase().endsWith("@nyu.edu") && (
               <p className="text-red-400 text-sm mb-2">Email is already registered</p>
             )}
             {emailAvailable === true && (
