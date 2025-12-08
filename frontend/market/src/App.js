@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import Buy from "./pages/Buy";
 import Sell from "./pages/Sell";
 import Register from "./pages/Register";
+import EmailVerification from "./pages/EmailVerification";
 import Products from "./pages/Products";
 import CreateProduct from "./pages/CreateProduct";
 import ChatWindow from "./components/ChatWindow";
@@ -31,6 +32,7 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/products/create" element={<CreateProduct />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
         <Route path="/chat/:me/:other" element={<ChatWindow />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         

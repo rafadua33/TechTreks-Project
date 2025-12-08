@@ -101,7 +101,9 @@ const Register = () => {
     setError(null);
    
     try {
-      // Send registration data to backend
+      // Step 1: Send registration data to backend
+      // Backend will validate data and send verification code to email
+      // User account is NOT created yet - it's stored as PendingVerification
       const res = await fetch("http://localhost:5001/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,36 +114,26 @@ const Register = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        // Handle registration errors
+        // Handle registration errors from backend
+        // Could be validation error, username taken, email already registered, etc.
         setError(data.error || "Registration failed. Please try again.");
         setLoading(false);
         return;
       }
 
-      // Registration successful - now log the user in
-      const loginRes = await fetch("http://localhost:5001/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
+      // Registration data accepted! Verification code sent to email
+      // Redirect to email verification page
+      // Pass email in state so verification page knows which email to verify
+      navigate("/verify-email", { 
+        state: { email: email },
+        replace: true 
       });
-
-      const loginData = await loginRes.json();
-
-      if (!loginRes.ok) {
-        setError("Account created but login failed. Please log in manually.");
-        setLoading(false);
-        return;
-      }
-
-      // Successfully registered and logged in - redirect to home
-      navigate("/", { replace: true });
     } catch (err) {
       console.error("Network error:", err);
       setError("Network error. Please check your connection and try again.");
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#000328] text-white flex flex-col items-center justify-start mt-20">
