@@ -1,8 +1,50 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # create db instance 
 db = SQLAlchemy()
+
+class PendingVerification(db.Model):
+    """
+    Temporary storage for users who have registered but not yet verified their email
+    
+    This table stores incomplete registration attempts. When a user submits the
+    registration form with valid data, they are NOT created as a User yet. Instead:
+    1. Their info (username, email, password_hash) is stored here with a 4-digit code
+    2. An email with the code is sent to them
+    3. When they enter the correct code, the User account is created and this record deleted
+    
+    Attributes:
+        id: Primary key
+        email: User's email address (must end with @nyu.edu)
+        username: Desired username for the account
+        password_hash: Hashed password for security
+        code: 4-digit verification code sent to their email
+        created_at: When this pending verification was created
+        expires_at: When the code expires (10 minutes after creation)
+        attempts: Number of failed verification attempts (prevent brute force)
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), nullable=False)
+    username = db.Column(db.String(80), nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    code = db.Column(db.String(4), nullable=False)  # 4-digit verification code
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)  # Code expires after 10 minutes
+    attempts = db.Column(db.Integer, default=0, nullable=False)  # Failed verification attempts
+    
+    def __repr__(self):
+        return f'<PendingVerification {self.email}>'
+    
+    def is_expired(self):
+        """Check if the verification code has expired"""
+        return datetime.utcnow() > self.expires_at
+    
+    def increment_attempts(self):
+        """Increment failed attempt counter (used for rate limiting)"""
+        self.attempts += 1
+        db.session.commit()
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
