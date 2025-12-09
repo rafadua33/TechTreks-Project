@@ -49,3 +49,4 @@ frontend/market/yarn.lock
 frontend/market/package-lock.json
 
 
+backend/.env

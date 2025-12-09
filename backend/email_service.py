@@ -63,18 +63,18 @@ def send_verification_email(to_email, code):
     
     # Construct the email object with sender, recipient, subject, and HTML content
     # The HTML content is styled to match TechTreks branding with purple accents
-    # Using your verified NYU email as sender for the free tier testing
+    # Using a verified sender email (must be added to Brevo account)
     email_message = {
         "sender": {
-            "email": "el4235@nyu.edu",
-            "name": "TechTreks Verification"
+            "email": "mrkt.nyu25@gmail.com",
+            "name": "TechTreks"
         },
         "to": [
             {
                 "email": to_email
             }
         ],
-        "subject": "TechTreks - Verify Your Email",
+        "subject": "MRKT@NYU - Verify Your Email",
         "htmlContent": f"""
             <!DOCTYPE html>
             <html>
@@ -92,7 +92,7 @@ def send_verification_email(to_email, code):
             <body>
                 <div class="container">
                     <div class="header">
-                        <h2 style="color: #000328;">Welcome to TechTreks!</h2>
+                        <h2 style="color: #000328;">Welcome to MRKT@NYU!</h2>
                         <p style="color: #666;">Complete your registration to get started</p>
                     </div>
                     
