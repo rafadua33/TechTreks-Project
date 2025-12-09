@@ -63,10 +63,11 @@ def send_verification_email(to_email, code):
     
     # Construct the email object with sender, recipient, subject, and HTML content
     # The HTML content is styled to match TechTreks branding with purple accents
+    # Using your verified NYU email as sender for the free tier testing
     email_message = {
         "sender": {
-            "email": "noreply@techtreks.com",
-            "name": "TechTreks"
+            "email": "el4235@nyu.edu",
+            "name": "TechTreks Verification"
         },
         "to": [
             {
