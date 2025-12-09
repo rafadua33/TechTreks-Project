@@ -35,3 +35,17 @@ test_db_setup.py
 tmp_untracked_backups/
 tmp_merge_backups/
 
+# images / uploads
+backend/static/uploads/
+**/static/uploads/
+
+# database files
+backend/instance/users.db
+
+# yarn
+frontend/market/yarn.lock
+
+# package-lock
+frontend/market/package-lock.json
+
+
