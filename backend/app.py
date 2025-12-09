@@ -5,7 +5,11 @@ from models import db, Message, User
 from flask_socketio import SocketIO, emit, join_room
 import logging
 import os
+from dotenv import load_dotenv
 
+# Load environment variables from .env file at startup
+# This makes BREVO_API_KEY available to email_service module
+load_dotenv()
 
 app = Flask(__name__)
 
